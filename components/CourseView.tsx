@@ -156,7 +156,7 @@ export const CourseView: React.FC<CourseViewProps> = ({ course, onBack }) => {
              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
              <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">
-                 <Sparkles size={12} /> Estrategia v1.2 Premium
+                 <Sparkles size={12} /> Estrategia v1.2.1 Premium
                </div>
                <h1 className="text-4xl md:text-5xl font-black mb-3 leading-tight">{course.title}</h1>
                <p className="text-xl text-white/90 font-light max-w-2xl">{course.subtitle}</p>

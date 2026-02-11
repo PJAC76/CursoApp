@@ -4,7 +4,9 @@ import { Course, PillarsResponse, VariationsResponse, Pillar, SearchSource } fro
 
 const getAiClient = () => {
   const apiKey = process.env.API_KEY;
-  if (!apiKey) throw new Error("API_KEY_MISSING");
+  if (!apiKey) {
+    throw new Error("API_KEY_MISSING: Por favor, asegúrate de que la variable de entorno API_KEY esté configurada correctamente en el panel de control de Vercel.");
+  }
   return new GoogleGenAI({ apiKey });
 };
 
