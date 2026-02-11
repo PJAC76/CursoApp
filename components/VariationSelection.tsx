@@ -1,6 +1,7 @@
+
 import React from 'react';
-import { Variation, Pillar } from '../types';
-import { BookOpen, Target, ArrowLeft } from 'lucide-react';
+import { Variation, Pillar, SearchSource } from '../types';
+import { BookOpen, Target, ArrowLeft, ExternalLink } from 'lucide-react';
 
 interface VariationSelectionProps {
   pillar: Pillar;
@@ -8,9 +9,12 @@ interface VariationSelectionProps {
   onSelect: (variation: Variation) => void;
   onBack: () => void;
   isLoading: boolean;
+  sources: SearchSource[];
 }
 
-export const VariationSelection: React.FC<VariationSelectionProps> = ({ pillar, variations, onSelect, onBack, isLoading }) => {
+export const VariationSelection: React.FC<VariationSelectionProps> = ({ pillar, variations, onSelect, onBack, isLoading, sources }) => {
+  const safeVariations = variations || [];
+
   return (
     <div className="space-y-8 animate-fade-in">
        <button 
@@ -40,28 +44,52 @@ export const VariationSelection: React.FC<VariationSelectionProps> = ({ pillar, 
              <p className="text-slate-500 animate-pulse">Diseñando el curso completo con imágenes y quiz...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3">
-            {variations.map((variation, index) => (
-              <button
-                key={index}
-                onClick={() => onSelect(variation)}
-                className="flex items-center gap-4 p-5 bg-white border border-slate-200 rounded-xl hover:border-indigo-400 hover:bg-indigo-50/30 transition-all text-left w-full group"
-              >
-                <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                  {index + 1}
+          <>
+            <div className="grid grid-cols-1 gap-3">
+              {safeVariations.map((variation, index) => (
+                <button
+                  key={index}
+                  onClick={() => onSelect(variation)}
+                  className="flex items-center gap-4 p-5 bg-white border border-slate-200 rounded-xl hover:border-indigo-400 hover:bg-indigo-50/30 transition-all text-left w-full group"
+                >
+                  <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    {index + 1}
+                  </div>
+                  <div className="flex-grow">
+                    <h4 className="text-lg font-semibold text-slate-900 group-hover:text-indigo-700">
+                      {variation.title}
+                    </h4>
+                    <p className="text-sm text-slate-500 mt-1">
+                      Enfoque: {variation.focus}
+                    </p>
+                  </div>
+                  <BookOpen className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
+                </button>
+              ))}
+            </div>
+
+            {(sources || []).length > 0 && (
+              <div className="mt-12 pt-6 border-t border-slate-200">
+                <h4 className="text-sm font-semibold text-slate-500 mb-3 flex items-center gap-2">
+                  <span className="bg-indigo-100 p-1 rounded">G</span> Tendencias y Referencias (Google Search)
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {sources.map((source, idx) => (
+                    <a 
+                      key={idx}
+                      href={source.uri}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
+                    >
+                      {source.title}
+                      <ExternalLink size={10} />
+                    </a>
+                  ))}
                 </div>
-                <div className="flex-grow">
-                  <h4 className="text-lg font-semibold text-slate-900 group-hover:text-indigo-700">
-                    {variation.title}
-                  </h4>
-                  <p className="text-sm text-slate-500 mt-1">
-                    Enfoque: {variation.focus}
-                  </p>
-                </div>
-                <BookOpen className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
-              </button>
-            ))}
-          </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

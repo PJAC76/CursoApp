@@ -1,5 +1,7 @@
 {
   "name": "CursoAPP",
-  "description": "Un mentor inteligente para crear estrategias de cursos y contenido educativo.",
+  "description": "Estratega inteligente de contenido con generación de imágenes por IA, exportación multiformato y galería interactiva.",
+  "version": "1.2.0-stable",
+  "environment": "google-ai-studio",
   "requestFramePermissions": []
 }

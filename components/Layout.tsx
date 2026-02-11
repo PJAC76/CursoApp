@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BookOpen, Sparkles } from 'lucide-react';
 
@@ -36,8 +37,17 @@ export const Layout: React.FC<LayoutProps> = ({ children, onRestart }) => {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 text-center text-slate-400 text-sm">
-        <p>Potenciado por Gemini 2.5 Flash & Google Search</p>
+      <footer className="py-8 border-t border-slate-200 mt-12 bg-white/50">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-slate-400 text-sm">
+          <p>Potenciado por Gemini 3 Flash & Google Search</p>
+          <div className="flex items-center gap-4">
+            <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded text-[10px] font-bold uppercase tracking-wider">
+              Stable v1.2.0
+            </span>
+            <span className="text-slate-300">|</span>
+            <p>© 2024 CursoAPP Strategy Builder</p>
+          </div>
+        </div>
       </footer>
     </div>
   );

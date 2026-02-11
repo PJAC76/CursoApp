@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Pillar, SearchSource } from '../types';
 import { Layers, ArrowRight, ExternalLink } from 'lucide-react';
@@ -11,6 +12,8 @@ interface PillarSelectionProps {
 }
 
 export const PillarSelection: React.FC<PillarSelectionProps> = ({ topic, pillars, onSelect, isLoading, sources }) => {
+  const safePillars = pillars || [];
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="text-center space-y-2">
@@ -31,7 +34,7 @@ export const PillarSelection: React.FC<PillarSelectionProps> = ({ topic, pillars
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pillars.map((pillar, index) => (
+            {safePillars.map((pillar, index) => (
               <button
                 key={index}
                 onClick={() => onSelect(pillar)}
@@ -53,7 +56,7 @@ export const PillarSelection: React.FC<PillarSelectionProps> = ({ topic, pillars
             ))}
           </div>
 
-          {sources.length > 0 && (
+          {(sources || []).length > 0 && (
             <div className="mt-8 pt-6 border-t border-slate-200">
               <h4 className="text-sm font-semibold text-slate-500 mb-3 flex items-center gap-2">
                 <span className="bg-indigo-100 p-1 rounded">G</span> Fuentes de Google Search

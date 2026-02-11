@@ -1,3 +1,4 @@
+
 export interface Pillar {
   title: string;
   description: string;
@@ -23,6 +24,7 @@ export interface CourseModule {
   title: string;
   content: string; // Markdown supported
   imageKeyword: string;
+  imageUrl?: string; // URL de la imagen generada por IA
 }
 
 export interface Course {
