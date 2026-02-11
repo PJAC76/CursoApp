@@ -1,7 +1,7 @@
 {
   "name": "Anadeco",
   "description": "Estratega inteligente de contenido con generación de imágenes por IA, exportación multiformato y barra de progreso dinámica.",
-  "version": "1.2.8-stable",
+  "version": "1.2.9-stable",
   "environment": "google-ai-studio",
   "requestFramePermissions": []
 }
