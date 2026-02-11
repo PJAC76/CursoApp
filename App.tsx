@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { TopicInput } from './components/TopicInput';
 import { PillarSelection } from './components/PillarSelection';
@@ -11,6 +11,7 @@ import { generatePillars, generateVariations, generateCourse, generateModuleImag
 const App: React.FC = () => {
   const [step, setStep] = useState<AppStep>(AppStep.INPUT_TOPIC);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const [mainTopic, setMainTopic] = useState('');
@@ -19,6 +20,32 @@ const App: React.FC = () => {
   const [selectedPillar, setSelectedPillar] = useState<Pillar | null>(null);
   const [variations, setVariations] = useState<Variation[]>([]);
   const [course, setCourse] = useState<Course | null>(null);
+
+  // Simulated progress logic for AI waiting periods
+  useEffect(() => {
+    let interval: number;
+    if (loading) {
+      setProgress(5); // Start immediately
+      interval = window.setInterval(() => {
+        setProgress(prev => {
+          if (prev < 40) return prev + 3;      // Early stage: fast
+          if (prev < 70) return prev + 1.5;    // Mid stage: medium
+          if (prev < 90) return prev + 0.5;    // Late stage: slow
+          if (prev < 98) return prev + 0.1;    // Finalizing: very slow
+          return prev;
+        });
+      }, 300);
+    } else {
+      if (progress > 0) {
+        setProgress(100);
+        const timer = setTimeout(() => setProgress(0), 800);
+        return () => clearTimeout(timer);
+      }
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [loading]);
 
   const handleTopicSubmit = async (topic: string) => {
     setLoading(true);
@@ -63,7 +90,6 @@ const App: React.FC = () => {
         let combinedQuizzes: QuizQuestion[] = [];
         let finalCourse: Course | null = null;
 
-        // Generar cada parte de la formación secuencialmente para mantener la calidad
         for (const variation of selectedVariations) {
           const part = await generateCourse(variation.title, selectedPillar.title, moduleCount);
           combinedModules = [...combinedModules, ...part.modules];
@@ -84,13 +110,12 @@ const App: React.FC = () => {
           setCourse(finalCourse);
           setStep(AppStep.VIEW_COURSE);
 
-          // Generación asíncrona de todas las imágenes
+          // Image generation doesn't block the UI as much but contributes to overall state
           const updatedModules = [...combinedModules];
           for (let i = 0; i < updatedModules.length; i++) {
             try {
               const imgUrl = await generateModuleImage(updatedModules[i].imageKeyword, finalCourse.title);
               updatedModules[i] = { ...updatedModules[i], imageUrl: imgUrl };
-              // Actualización parcial reactiva para ver el progreso real
               setCourse(prev => prev ? { ...prev, modules: [...updatedModules] } : null);
             } catch (e) {
               console.warn("Failed to generate image for module", i);
@@ -106,7 +131,11 @@ const App: React.FC = () => {
   };
 
   return (
-    <Layout onRestart={() => setStep(AppStep.INPUT_TOPIC)}>
+    <Layout 
+      onRestart={() => setStep(AppStep.INPUT_TOPIC)} 
+      isLoading={loading}
+      progress={progress}
+    >
       {error && (
         <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg flex items-center justify-between animate-bounce">
           <div className="flex flex-col">

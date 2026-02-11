@@ -1,7 +1,7 @@
 {
-  "name": "CursoAPP",
-  "description": "Estratega inteligente de contenido con generación de imágenes por IA, exportación multiformato y galería interactiva.",
-  "version": "1.2.3-stable",
+  "name": "Anadeco",
+  "description": "Estratega inteligente de contenido con generación de imágenes por IA, exportación multiformato y barra de progreso dinámica.",
+  "version": "1.2.8-stable",
   "environment": "google-ai-studio",
   "requestFramePermissions": []
 }
