@@ -131,15 +131,15 @@ export const generateVariations = async (pillarTitle: string, mainTopic: string)
   return { variations: data?.variations || [] };
 };
 
-export const generateCourse = async (variationTitle: string, pillarTitle: string): Promise<Course> => {
+export const generateCourse = async (variationTitle: string, pillarTitle: string, numModules: number = 5): Promise<Course> => {
   const ai = getAiClient();
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: `Crea un mini-curso detallado para: "${variationTitle}" (Contexto: "${pillarTitle}").`,
+    contents: `Crea un mini-curso detallado de exactamente ${numModules} módulos para: "${variationTitle}" (Contexto: "${pillarTitle}").`,
     config: {
       responseMimeType: "application/json",
       responseSchema: courseSchema,
-      systemInstruction: "Eres un profesor experto. Creas contenido educativo excelente en español con Markdown rico.",
+      systemInstruction: `Eres un profesor experto. Creas exactamente ${numModules} módulos educativos excelentes en español con Markdown rico.`,
     },
   });
   const data = parseAIJSON(response.text || "{}") as Course;

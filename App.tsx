@@ -5,7 +5,7 @@ import { TopicInput } from './components/TopicInput';
 import { PillarSelection } from './components/PillarSelection';
 import { VariationSelection } from './components/VariationSelection';
 import { CourseView } from './components/CourseView';
-import { AppStep, Pillar, Variation, Course, SearchSource } from './types';
+import { AppStep, Pillar, Variation, Course, SearchSource, CourseModule, QuizQuestion } from './types';
 import { generatePillars, generateVariations, generateCourse, generateModuleImage } from './services/geminiService';
 
 const App: React.FC = () => {
@@ -54,29 +54,52 @@ const App: React.FC = () => {
     }
   };
 
-  const handleVariationSelect = async (variation: Variation) => {
+  const handleVariationsSelect = async (selectedVariations: Variation[], moduleCount: number) => {
     setLoading(true);
     setError(null);
     try {
       if (selectedPillar) {
-        const generatedCourse = await generateCourse(variation.title, selectedPillar.title);
-        setCourse(generatedCourse);
-        setStep(AppStep.VIEW_COURSE);
+        let combinedModules: CourseModule[] = [];
+        let combinedQuizzes: QuizQuestion[] = [];
+        let finalCourse: Course | null = null;
 
-        // Generación asíncrona de imágenes para no bloquear la vista inicial del curso
-        const updatedModules = [...generatedCourse.modules];
-        for (let i = 0; i < updatedModules.length; i++) {
-          try {
-            const imgUrl = await generateModuleImage(updatedModules[i].imageKeyword, generatedCourse.title);
-            updatedModules[i] = { ...updatedModules[i], imageUrl: imgUrl };
-            setCourse(prev => prev ? { ...prev, modules: [...updatedModules] } : null);
-          } catch (e) {
-            console.warn("Failed to generate image for module", i);
+        // Generar cada parte de la formación secuencialmente para mantener la calidad
+        for (const variation of selectedVariations) {
+          const part = await generateCourse(variation.title, selectedPillar.title, moduleCount);
+          combinedModules = [...combinedModules, ...part.modules];
+          combinedQuizzes = [...combinedQuizzes, ...part.quiz];
+          
+          if (!finalCourse) {
+            finalCourse = { 
+              ...part, 
+              title: selectedVariations.length > 1 ? `Estrategia Integral: ${selectedPillar.title}` : part.title,
+              subtitle: selectedVariations.length > 1 ? `Formación fusionada basada en ${selectedVariations.length} enfoques estratégicos.` : part.subtitle
+            };
+          }
+        }
+
+        if (finalCourse) {
+          finalCourse.modules = combinedModules;
+          finalCourse.quiz = combinedQuizzes;
+          setCourse(finalCourse);
+          setStep(AppStep.VIEW_COURSE);
+
+          // Generación asíncrona de todas las imágenes
+          const updatedModules = [...combinedModules];
+          for (let i = 0; i < updatedModules.length; i++) {
+            try {
+              const imgUrl = await generateModuleImage(updatedModules[i].imageKeyword, finalCourse.title);
+              updatedModules[i] = { ...updatedModules[i], imageUrl: imgUrl };
+              // Actualización parcial reactiva para ver el progreso real
+              setCourse(prev => prev ? { ...prev, modules: [...updatedModules] } : null);
+            } catch (e) {
+              console.warn("Failed to generate image for module", i);
+            }
           }
         }
       }
     } catch (err) {
-      setError("Error construyendo el curso.");
+      setError("Error construyendo la formación integral.");
     } finally {
       setLoading(false);
     }
@@ -86,8 +109,11 @@ const App: React.FC = () => {
     <Layout onRestart={() => setStep(AppStep.INPUT_TOPIC)}>
       {error && (
         <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg flex items-center justify-between animate-bounce">
-          <p className="font-medium">{error}</p>
-          <button onClick={() => setError(null)} className="text-sm font-bold ml-4">✕</button>
+          <div className="flex flex-col">
+            <p className="font-bold">Error de Proceso</p>
+            <p className="text-sm">{error}</p>
+          </div>
+          <button onClick={() => setError(null)} className="text-sm font-bold ml-4 p-2 hover:bg-red-100 rounded-full transition-colors">✕</button>
         </div>
       )}
 
@@ -105,7 +131,7 @@ const App: React.FC = () => {
         <VariationSelection 
           pillar={selectedPillar} 
           variations={variations} 
-          onSelect={handleVariationSelect}
+          onGenerateSelected={handleVariationsSelect}
           onBack={() => setStep(AppStep.SELECT_PILLAR)}
           isLoading={loading}
           sources={searchSources}
